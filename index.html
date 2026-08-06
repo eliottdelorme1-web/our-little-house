@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Little House 🏡</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏡</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏡</text></svg>">
+  <meta name="theme-color" content="#151022">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.7.0/dist/css/jsvectormap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.7.0/dist/js/jsvectormap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.7.0/dist/maps/world.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div id="loginView" class="login-wrap">
+    <div class="login-card">
+      <h1>🏡 Our Little House</h1>
+      <p class="muted center">A private place for Eliott and Yasmin.</p>
+
+      <label>Who are you?</label>
+      <div class="person-choice">
+        <button class="person-button" data-name="Yasmin">🌸 Yasmin</button>
+        <button class="person-button" data-name="Eliott">💙 Eliott</button>
+      </div>
+
+      <label>Our private PIN</label>
+      <input id="loginPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" />
+
+      <button class="button full" id="loginButton">Enter our house 💕</button>
+      <div id="loginMessage"></div>
+    </div>
+  </div>
+
+  <div id="appView" class="app hidden">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand" id="secretHouseLogo" title="Our Little House">
+        <h1>🏡 Our Little House</h1>
+        <p>Our private shared world.</p>
+      </div>
+
+      <div class="nav-title">Our home</div>
+      <button class="nav-button active" data-page="home">🏠 Home</button>
+      <button class="nav-button" data-page="todo">✅ To-Do List</button>
+      <button class="nav-button" data-page="grocery">🛒 Grocery List</button>
+      <button class="nav-button" data-page="calendar">📅 Calendar</button>
+      <button class="nav-button" data-page="memories">📸 Memory Room</button>
+
+      <div class="nav-title">Our favorites</div>
+      <button class="nav-button" data-page="entertainment">🎬 Entertainment</button>
+      <button class="nav-button" data-page="food">🍽️ Restaurants</button>
+      <button class="nav-button" data-page="worldmap">🗺️ World Map</button>
+
+      <div class="nav-title">Just for us</div>
+      <button class="nav-button" data-page="dreams">💭 Dreams & Ideas</button>
+      <button class="nav-button" data-page="chat">💬 Private Chat</button>
+    </aside>
+
+    <main class="main">
+      <button class="button secondary mobile-menu" id="mobileMenuButton">☰ Rooms</button>
+
+      <div class="topbar">
+        <div>
+          <h2 id="pageTitle">Living Room</h2>
+          <p id="pageSubtitle">Welcome back to your little shared world.</p>
+        </div>
+        <div class="user-area">
+          <div class="chip" id="userChip">💕</div>
+          <button class="button secondary small-btn" id="logoutButton">Log out</button>
+        </div>
+      </div>
+
+      <section class="page active" id="home">
+        <div class="hero">
+          <h3>Welcome to Our Little House 🏡</h3>
+          <p>A simple, cosy place for our plans, lists, memories and favorite things.</p>
+
+          <div class="relationship-card">
+            <div class="relationship-heart">💕</div>
+            <div>
+              <div class="relationship-label">Our date</div>
+              <div class="relationship-date">16.01.2024</div>
+              <div class="relationship-days"><span id="relationshipDays">0</span> days together</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="card home-stat"><div class="stat" id="todoCount">0</div><div class="title">Things to do</div><p>Open tasks for our home and life.</p></div>
+          <div class="card home-stat"><div class="stat" id="groceryCount">0</div><div class="title">Groceries</div><p>Items still waiting to be bought.</p></div>
+          <div class="card home-stat"><div class="stat" id="memoryCount">0</div><div class="title">Memories</div><p>Moments already saved together.</p></div>
+          <div class="card home-stat"><div class="stat" id="restaurantCount">0</div><div class="title">Restaurants</div><p>Places visited or waiting to be tried.</p></div>
+        </div>
+      </section>
+
+      <section class="page" id="todo">
+        <div class="room-header">
+          <div><h3>✅ To-Do List</h3><span class="muted">Simple shared tasks that you can tick off together.</span></div>
+        </div>
+        <div class="simple-page-grid">
+          <div class="card">
+            <div class="quick-add">
+              <input id="todoTitle" placeholder="What needs to be done?" />
+              <button class="button" id="addTodoButton">Add task</button>
+            </div>
+          </div>
+          <div id="todoList" class="check-list"></div>
+        </div>
+      </section>
+
+      <section class="page" id="grocery">
+        <div class="room-header">
+          <div><h3>🛒 Grocery List</h3><span class="muted">Add what you need and tick it when it is in the basket.</span></div>
+        </div>
+        <div class="simple-page-grid">
+          <div class="card">
+            <div class="grocery-add">
+              <input id="groceryName" placeholder="Item, e.g. tomatoes" />
+              <input id="groceryQuantity" placeholder="Quantity, e.g. 2 packs" />
+              <select id="groceryCategory">
+                <option>General</option>
+                <option>Fruit & Vegetables</option>
+                <option>Fridge</option>
+                <option>Freezer</option>
+                <option>Drinks</option>
+                <option>Household</option>
+                <option>Other</option>
+              </select>
+              <button class="button" id="addGroceryButton">Add item</button>
+            </div>
+          </div>
+          <div id="groceryList" class="check-list"></div>
+        </div>
+      </section>
+
+      <section class="page" id="dreams">
+        <div class="room-header">
+          <div><h3>💭 Dreams & Ideas</h3><span class="muted">Keep your wishes and shared ideas in one simple place.</span></div>
+        </div>
+        <div class="two-col">
+          <div id="dreamList" class="list"></div>
+          <div class="card sticky">
+            <h3>Add a new idea</h3>
+            <input id="dreamTitle" placeholder="Title" />
+            <textarea id="dreamDescription" placeholder="Description"></textarea>
+            <select id="dreamCategory">
+              <option>Travel</option><option>Home</option><option>Relationship</option><option>Project</option><option>Other</option>
+            </select>
+            <select id="dreamStatus">
+              <option>Dream</option><option>Planned</option><option>Completed</option>
+            </select>
+            <button class="button" id="addDreamButton">Save idea</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="entertainment">
+        <div class="room-header">
+          <div><h3>🎬 Entertainment</h3><span class="muted">Everything you want to watch or play, clearly separated by category.</span></div>
+        </div>
+        <div class="category-tabs" id="entertainmentFilters">
+          <button class="category-tab active" data-filter="All">✨ All</button>
+          <button class="category-tab" data-filter="Movie">🎬 Movies</button>
+          <button class="category-tab" data-filter="TV Show">📺 TV Shows</button>
+          <button class="category-tab" data-filter="Anime">🌸 Anime</button>
+          <button class="category-tab" data-filter="Game">🎮 Games</button>
+        </div>
+        <div class="two-col">
+          <div id="entertainmentList" class="entertainment-grid"></div>
+          <div class="card sticky">
+            <h3>Add something</h3>
+            <select id="entType"><option>Movie</option><option>TV Show</option><option>Anime</option><option>Game</option></select>
+            <input id="entTitle" placeholder="Title" />
+            <select id="entStatus"><option>Want to watch</option><option>Watching</option><option>Playing</option><option>Finished</option><option>Dropped</option></select>
+            <textarea id="entDescription" placeholder="Description"></textarea>
+            <div class="form-grid">
+              <input id="entEliott" type="number" min="1" max="5" placeholder="Eliott rating" />
+              <input id="entYasmin" type="number" min="1" max="5" placeholder="Yasmin rating" />
+            </div>
+            <button class="button" id="addEntertainmentButton">Save</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="food">
+        <div class="room-header">
+          <div><h3>🍽️ Restaurants</h3><span class="muted">Restaurants you visited together and places you still want to try.</span></div>
+        </div>
+        <div class="two-col">
+          <div id="restaurantList" class="list"></div>
+          <div class="card sticky">
+            <h3>Add a restaurant</h3>
+            <input id="restName" placeholder="Restaurant name" />
+            <div class="form-grid">
+              <input id="restCity" placeholder="City" />
+              <input id="restCuisine" placeholder="Cuisine" />
+            </div>
+            <input id="restMaps" placeholder="Google Maps link" />
+            <input id="restDate" type="date" />
+            <textarea id="restDescription" placeholder="Small description"></textarea>
+            <textarea id="restFood" placeholder="What did you order?"></textarea>
+            <div class="form-grid">
+              <input id="restEliott" type="number" min="1" max="5" placeholder="Eliott rating" />
+              <input id="restYasmin" type="number" min="1" max="5" placeholder="Yasmin rating" />
+            </div>
+            <select id="restStatus"><option>Visited</option><option>Want to try</option></select>
+            <select id="restReturn"><option value="">Would we return?</option><option value="true">Yes</option><option value="false">No</option></select>
+            <button class="button" id="addRestaurantButton">Save restaurant</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="worldmap">
+        <div class="room-header">
+          <div><h3>🗺️ Our World Map</h3><span class="muted">Click a country and choose its place in your story.</span></div>
+        </div>
+
+        <div class="map-legend">
+          <span><i class="legend-dot visited-dot"></i> Visited</span>
+          <span><i class="legend-dot want-dot"></i> Want to visit</span>
+          <span><i class="legend-dot dream-dot"></i> Dream destination</span>
+        </div>
+
+        <div class="world-layout">
+          <div class="card map-card">
+            <div id="worldMap"></div>
+            <p class="small center">Click a country to select it. You can zoom and move the map.</p>
+          </div>
+
+          <div class="card sticky">
+            <h3 id="selectedCountryHeading">Choose a country</h3>
+            <div class="form-grid">
+              <input id="countryCode" placeholder="Country code, e.g. JP" readonly />
+              <input id="countryName" placeholder="Country name" readonly />
+            </div>
+            <select id="countryStatus">
+              <option>Visited</option>
+              <option>Want to visit</option>
+              <option>Dream destination</option>
+              <option>Not visited</option>
+            </select>
+            <textarea id="countryNotes" placeholder="Notes, cities or favorite memories..."></textarea>
+            <button class="button full" id="saveCountryButton">Save and color country</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Our countries</h3>
+          <div id="countryGrid" class="country-grid"></div>
+        </div>
+      </section>
+
+      <section class="page" id="memories">
+        <div class="room-header">
+          <div><h3>📸 Memory Room</h3><span class="muted">Your moments, photos and favorite memories.</span></div>
+        </div>
+        <div class="two-col">
+          <div id="memoryList" class="list"></div>
+          <div class="card sticky">
+            <h3>Add a memory</h3>
+            <input id="memoryTitle" placeholder="Memory title" />
+            <input id="memoryDate" type="date" />
+            <input id="memoryLocation" placeholder="Location" />
+            <textarea id="memoryDescription" placeholder="Description"></textarea>
+            <textarea id="memoryFavorite" placeholder="Favorite moment"></textarea>
+
+            <label class="photo-upload-button" for="newMemoryPhoto">
+              📸 Choose a photo
+            </label>
+            <input id="newMemoryPhoto" class="hidden-file-input" type="file" accept="image/*" />
+            <div id="newMemoryPhotoName" class="small">No photo selected</div>
+
+            <button class="button" id="addMemoryButton">Save memory</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="calendar">
+        <div class="room-header">
+          <div><h3>📅 Calendar</h3><span class="muted">Plan your dates, trips and little moments.</span></div>
+        </div>
+        <div class="two-col">
+          <div>
+            <div class="card">
+              <div class="form-grid">
+                <select id="calMonth"></select>
+                <select id="calYear"></select>
+              </div>
+            </div>
+            <div class="card"><div id="calendarGrid" class="calendar-grid"></div></div>
+            <div id="eventList" class="list"></div>
+          </div>
+          <div class="card sticky">
+            <h3>Add an event</h3>
+            <input id="eventTitle" placeholder="Event title" />
+            <input id="eventDate" type="date" />
+            <input id="eventTime" type="time" />
+            <input id="eventLocation" placeholder="Location" />
+            <textarea id="eventDescription" placeholder="Description"></textarea>
+            <button class="button" id="addEventButton">Save event</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="chat">
+        <div class="room-header">
+          <div><h3>💬 Private Chat</h3><span class="muted">A permanent private conversation for both of you.</span></div>
+        </div>
+        <div class="card">
+          <div id="chatBox" class="chat-box"></div>
+          <div class="row chat-input-row">
+            <input id="chatInput" placeholder="Write a message..." />
+            <button class="button" id="sendMessageButton">Send 💌</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div id="easterEggToast" class="easter-egg-toast hidden"></div>
+
+  <div id="secretModal" class="modal-overlay hidden">
+    <div class="secret-modal">
+      <button class="modal-close" id="closeSecretModal">×</button>
+      <div class="secret-symbol">🏡✨</div>
+      <h2>Our secret little corner</h2>
+      <p>Miss Nebula and Marshmallow found the hidden room.</p>
+      <p class="secret-message">Home is wherever we are together. 💕</p>
+    </div>
+  </div>
+
+  <div id="photoLightbox" class="modal-overlay hidden">
+    <button class="lightbox-close" id="closePhotoLightbox">×</button>
+    <img id="lightboxImage" class="lightbox-image" alt="Memory photo" />
+  </div>
+</body>
+</html>
