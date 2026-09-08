@@ -1,5 +1,5 @@
-const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
-const SUPABASE_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
+const SUPABASE_URL = "https://ojqeyoxboecdiumetdab.supabase.co";
+const SUPABASE_KEY = "sb_publishable_AOHdVdST0ACWtuttlRyB-w_sJllLWwf";
 
 const SHARED_PIN = "1601";
 const RELATIONSHIP_DATE = new Date("2024-01-16T00:00:00");
